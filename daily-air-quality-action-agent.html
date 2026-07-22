@@ -1,0 +1,698 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Daily Air Quality Action Agent</title>
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    html, body { height: 100%; font-family: -apple-system, "Segoe UI", system-ui, sans-serif; }
+    body { display: flex; flex-direction: column; }
+
+    /* ══════════════ INTRO PAGE ══════════════ */
+    /* Background set via inline style on the element — cannot be overridden by injected stylesheets */
+    #intro-page {
+      display: flex;
+      flex-direction: column;
+      min-height: 100vh;
+    }
+    #intro-page .i-nav {
+      display: flex;
+      align-items: center;
+      padding: 18px 48px;
+      border-bottom: 1px solid rgba(255,255,255,0.1);
+    }
+    #intro-page .i-brand {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+    #intro-page .i-brand-name {
+      font-size: 15px;
+      font-weight: 700;
+      color: #ffffff;
+      letter-spacing: 0.2px;
+    }
+    #intro-page .i-brand-sub {
+      font-size: 11px;
+      color: rgba(255,255,255,0.5);
+      margin-top: 2px;
+    }
+    #intro-page .i-badge {
+      margin-left: auto;
+      background: rgba(59,130,212,0.25);
+      border: 1px solid rgba(126,200,244,0.4);
+      color: #7ec8f4;
+      font-size: 11px;
+      font-weight: 600;
+      padding: 4px 14px;
+      border-radius: 20px;
+    }
+    #intro-page .i-hero {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      text-align: center;
+      padding: 64px 24px 40px;
+    }
+    #intro-page .i-icon-ring {
+      width: 90px;
+      height: 90px;
+      border-radius: 50%;
+      background: rgba(59,130,212,0.15);
+      border: 2px solid rgba(126,200,244,0.35);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      margin-bottom: 28px;
+    }
+    #intro-page .i-title {
+      font-size: 40px;
+      font-weight: 700;
+      line-height: 1.13;
+      letter-spacing: -0.5px;
+      color: #ffffff;
+      max-width: 680px;
+      margin-bottom: 16px;
+    }
+    #intro-page .i-title span { color: #7ec8f4; }
+    #intro-page .i-tagline {
+      font-size: 16px;
+      color: rgba(255,255,255,0.62);
+      max-width: 540px;
+      line-height: 1.7;
+      margin-bottom: 36px;
+    }
+    #intro-page .i-cta {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      background: #3b82d4;
+      color: #ffffff;
+      font-size: 14px;
+      font-weight: 600;
+      padding: 13px 32px;
+      border-radius: 8px;
+      border: none;
+      cursor: pointer;
+      font-family: inherit;
+      letter-spacing: 0.2px;
+    }
+    #intro-page .i-cta:hover { background: #2d6fc0; }
+    #intro-page .i-stats {
+      display: flex;
+      justify-content: center;
+      margin-top: 56px;
+      border-top: 1px solid rgba(255,255,255,0.1);
+      border-bottom: 1px solid rgba(255,255,255,0.1);
+      width: 100%;
+    }
+    #intro-page .i-stat {
+      flex: 1;
+      max-width: 180px;
+      padding: 20px 12px;
+      text-align: center;
+      border-right: 1px solid rgba(255,255,255,0.1);
+    }
+    #intro-page .i-stat:last-child { border-right: none; }
+    #intro-page .i-stat-n {
+      font-size: 26px;
+      font-weight: 700;
+      color: #7ec8f4;
+      line-height: 1;
+    }
+    #intro-page .i-stat-l {
+      font-size: 10px;
+      color: rgba(255,255,255,0.5);
+      margin-top: 5px;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+
+    /* Feature grid */
+    #intro-page .i-features {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+    }
+    #intro-page .i-feat {
+      background: #112538;
+      padding: 28px;
+      border-top: 1px solid rgba(255,255,255,0.08);
+      border-right: 1px solid rgba(255,255,255,0.08);
+    }
+    #intro-page .i-feat:nth-child(3),
+    #intro-page .i-feat:nth-child(6) { border-right: none; }
+    #intro-page .i-feat:hover { background: #1a3550; }
+    #intro-page .i-feat-icon {
+      width: 40px;
+      height: 40px;
+      border-radius: 8px;
+      background: rgba(59,130,212,0.2);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      margin-bottom: 14px;
+    }
+    #intro-page .i-feat h3 {
+      font-size: 14px;
+      font-weight: 600;
+      color: #ffffff;
+      margin-bottom: 6px;
+    }
+    #intro-page .i-feat p {
+      font-size: 13px;
+      color: rgba(255,255,255,0.52);
+      line-height: 1.6;
+    }
+
+    /* AQI scale */
+    #intro-page .i-aqi-section {
+      background: #0c2236;
+      border-top: 1px solid rgba(255,255,255,0.08);
+      padding: 34px 48px;
+    }
+    #intro-page .i-section-title {
+      font-size: 11px;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.8px;
+      color: rgba(255,255,255,0.4);
+      text-align: center;
+      margin-bottom: 18px;
+    }
+    #intro-page .i-aqi-row {
+      display: flex;
+      gap: 8px;
+      flex-wrap: wrap;
+      justify-content: center;
+    }
+    #intro-page .i-band {
+      flex: 1;
+      min-width: 88px;
+      max-width: 136px;
+      border-radius: 8px;
+      padding: 12px 8px;
+      text-align: center;
+    }
+    #intro-page .i-band-r { font-size: 13px; font-weight: 700; color: #ffffff; }
+    #intro-page .i-band-l { font-size: 10px; color: rgba(255,255,255,0.82); margin-top: 3px; text-transform: uppercase; letter-spacing: 0.4px; }
+    #intro-page .bg-good      { background: #22a85a; }
+    #intro-page .bg-moderate  { background: #f5a623; }
+    #intro-page .bg-sensitive { background: #e87722; }
+    #intro-page .bg-unhealthy { background: #d9292e; }
+    #intro-page .bg-very      { background: #7c5cd8; }
+    #intro-page .bg-hazardous { background: #7d1c1c; }
+
+    /* How it works */
+    #intro-page .i-how {
+      padding: 40px 48px 48px;
+      border-top: 1px solid rgba(255,255,255,0.08);
+    }
+    #intro-page .i-steps {
+      display: flex;
+      justify-content: center;
+      max-width: 780px;
+      margin: 0 auto;
+    }
+    #intro-page .i-step {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      text-align: center;
+      padding: 0 16px;
+      position: relative;
+    }
+    #intro-page .i-step:not(:last-child)::after {
+      content: '';
+      position: absolute;
+      top: 20px;
+      right: -4px;
+      width: 50%;
+      height: 1px;
+      background: rgba(255,255,255,0.15);
+    }
+    #intro-page .i-step:not(:first-child)::before {
+      content: '';
+      position: absolute;
+      top: 20px;
+      left: -4px;
+      width: 50%;
+      height: 1px;
+      background: rgba(255,255,255,0.15);
+    }
+    #intro-page .i-step-n {
+      width: 40px;
+      height: 40px;
+      border-radius: 50%;
+      background: #3b82d4;
+      color: #ffffff;
+      font-size: 15px;
+      font-weight: 700;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      margin-bottom: 12px;
+      position: relative;
+      z-index: 1;
+    }
+    #intro-page .i-step h3 { font-size: 13px; font-weight: 600; color: #ffffff; margin-bottom: 5px; }
+    #intro-page .i-step p  { font-size: 12px; color: rgba(255,255,255,0.5); line-height: 1.55; }
+
+    /* Intro footer */
+    #intro-page .i-footer {
+      padding: 16px 48px;
+      border-top: 1px solid rgba(255,255,255,0.08);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      flex-wrap: wrap;
+      gap: 8px;
+    }
+    #intro-page .i-footer span { font-size: 11px; color: rgba(255,255,255,0.3); }
+    #intro-page .i-powered { font-size: 11px; color: rgba(255,255,255,0.35); }
+    #intro-page .i-powered strong { color: rgba(255,255,255,0.6); }
+
+    /* ══════════════ APP PAGE ══════════════ */
+    #app-page {
+      display: none;
+      flex-direction: column;
+      height: 100vh;
+      overflow: hidden;
+      background: #f0f4f8;
+    }
+    #app-page.visible { display: flex; }
+
+    .app-header {
+      background: #1a3c5e;
+      color: #ffffff;
+      padding: 0 28px;
+      display: flex;
+      align-items: center;
+      gap: 14px;
+      height: 58px;
+      flex-shrink: 0;
+    }
+    .app-header-icon { width: 36px; height: 36px; flex-shrink: 0; }
+    .app-header-text h1 { font-size: 16px; font-weight: 600; color: #fff; line-height: 1.2; }
+    .app-header-text p  { font-size: 11px; color: rgba(255,255,255,0.6); margin-top: 1px; }
+    .app-header-right { margin-left: auto; display: flex; align-items: center; gap: 10px; }
+    .live-badge {
+      background: rgba(34,168,90,0.2);
+      border: 1px solid rgba(34,168,90,0.45);
+      color: #6fdb9e;
+      font-size: 11px;
+      font-weight: 600;
+      padding: 3px 10px;
+      border-radius: 20px;
+      display: flex;
+      align-items: center;
+      gap: 5px;
+    }
+    .live-dot { width: 6px; height: 6px; border-radius: 50%; background: #6fdb9e; }
+    .back-btn {
+      background: rgba(255,255,255,0.1);
+      border: 1px solid rgba(255,255,255,0.2);
+      color: #fff;
+      font-size: 11px;
+      padding: 4px 12px;
+      border-radius: 6px;
+      cursor: pointer;
+      font-family: inherit;
+    }
+    .back-btn:hover { background: rgba(255,255,255,0.18); }
+
+    .aqi-strip {
+      background: #ffffff;
+      border-bottom: 1px solid #e5e7eb;
+      padding: 6px 28px;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      flex-wrap: wrap;
+      flex-shrink: 0;
+    }
+    .aqi-strip .strip-lbl { font-size: 10px; font-weight: 700; color: #57606a; text-transform: uppercase; letter-spacing: 0.4px; margin-right: 2px; }
+    .lchip { font-size: 10px; font-weight: 600; padding: 2px 9px; border-radius: 10px; color: #fff; }
+    .lchip-good      { background: #22a85a; }
+    .lchip-moderate  { background: #f5a623; color: #1f2328; }
+    .lchip-sensitive { background: #e87722; }
+    .lchip-unhealthy { background: #d9292e; }
+    .lchip-very      { background: #7c5cd8; }
+    .lchip-hazardous { background: #7d1c1c; }
+
+    .app-body { flex: 1; display: flex; overflow: hidden; }
+
+    .sidebar {
+      width: 272px;
+      flex-shrink: 0;
+      background: #ffffff;
+      border-right: 1px solid #e5e7eb;
+      overflow-y: auto;
+      padding: 16px;
+      display: flex;
+      flex-direction: column;
+      gap: 18px;
+    }
+    .sb-ttl {
+      font-size: 10px;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.6px;
+      color: #57606a;
+      margin-bottom: 10px;
+    }
+    .p-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 7px; }
+    .p-card { background: #f7f8fa; border: 1px solid #e5e7eb; border-radius: 6px; padding: 9px 8px; text-align: center; }
+    .p-card .pl { font-size: 9px; font-weight: 700; color: #57606a; text-transform: uppercase; letter-spacing: 0.5px; }
+    .p-card .pv { font-size: 18px; font-weight: 700; color: #1a3c5e; margin: 3px 0 1px; }
+    .p-card .pu { font-size: 9px; color: #57606a; }
+
+    .rec-ul { list-style: none; display: flex; flex-direction: column; gap: 7px; }
+    .rec-ul li { font-size: 12px; line-height: 1.5; padding: 7px 9px; background: #f7f8fa; border-left: 3px solid #3b82d4; border-radius: 0 4px 4px 0; color: #1f2328; }
+
+    .qp-list { display: flex; flex-direction: column; gap: 5px; }
+    .qp-btn { background: #f7f8fa; border: 1px solid #e5e7eb; border-radius: 6px; padding: 7px 10px; font-size: 11px; color: #1a3c5e; cursor: pointer; text-align: left; font-family: inherit; line-height: 1.4; }
+    .qp-btn:hover { background: #dce8f5; border-color: #3b82d4; }
+
+    .chat-panel { flex: 1; display: flex; flex-direction: column; background: #f0f4f8; overflow: hidden; }
+    .chat-topbar { background: #fff; border-bottom: 1px solid #e5e7eb; padding: 12px 20px; display: flex; align-items: center; gap: 9px; flex-shrink: 0; }
+    .online-dot { width: 8px; height: 8px; border-radius: 50%; background: #22a85a; flex-shrink: 0; }
+    .chat-topbar h2 { font-size: 14px; font-weight: 600; color: #1f2328; }
+    .chat-topbar p  { font-size: 11px; color: #57606a; margin-left: auto; }
+    #root { flex: 1; overflow: hidden; position: relative; }
+
+    .app-footer { background: #fff; border-top: 1px solid #e5e7eb; text-align: center; padding: 8px 16px; font-size: 10px; color: #57606a; flex-shrink: 0; }
+
+    @media (max-width: 900px) { #intro-page .i-features { grid-template-columns: 1fr 1fr; } }
+    @media (max-width: 640px) {
+      #intro-page .i-title { font-size: 26px; }
+      #intro-page .i-features { grid-template-columns: 1fr; }
+      #intro-page .i-steps { flex-direction: column; align-items: flex-start; gap: 24px; }
+      #intro-page .i-step::after, #intro-page .i-step::before { display: none; }
+      #intro-page .i-aqi-section, #intro-page .i-how { padding: 28px 20px; }
+      #intro-page .i-nav { padding: 14px 20px; }
+      #intro-page .i-footer { padding: 14px 20px; }
+      .sidebar { display: none; }
+      .app-header { padding: 0 16px; }
+    }
+  </style>
+</head>
+<body>
+
+<!-- ══════════════════════════════════════════
+     INTRO / LANDING PAGE
+     background set inline — immune to injected CSS
+══════════════════════════════════════════ -->
+<div id="intro-page" style="background-color:#0f2d4a;color:#ffffff;">
+
+  <!-- Nav -->
+  <nav class="i-nav">
+    <div class="i-brand">
+      <svg width="32" height="32" viewBox="0 0 40 40" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+        <circle cx="20" cy="20" r="20" fill="#2c5f8a"/>
+        <path d="M8 20 Q14 13 20 20 Q26 27 32 20" stroke="#7ec8f4" stroke-width="2.2" stroke-linecap="round" fill="none"/>
+        <path d="M8 25 Q14 18 20 25 Q26 32 32 25" stroke="#ffffff" stroke-width="1.6" stroke-linecap="round" fill="none" opacity="0.6"/>
+        <circle cx="20" cy="14" r="3.5" fill="#f5a623"/>
+        <path d="M20 10 L21 7 M20 10 L17.5 7.5 M20 10 L22.5 7.5" stroke="#f5a623" stroke-width="1.2" stroke-linecap="round"/>
+      </svg>
+      <div>
+        <div class="i-brand-name">AQI Action Agent</div>
+        <div class="i-brand-sub">Powered by IBM watsonx Orchestrate</div>
+      </div>
+    </div>
+    <div class="i-badge">AI Agent &bull; Live</div>
+  </nav>
+
+  <!-- Hero -->
+  <section class="i-hero">
+    <div class="i-icon-ring">
+      <svg width="50" height="50" viewBox="0 0 48 48" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+        <circle cx="24" cy="12" r="6" fill="#f5a623"/>
+        <path d="M24 6 L25.5 2 M24 6 L21 3 M24 6 L27 3" stroke="#f5a623" stroke-width="1.5" stroke-linecap="round"/>
+        <path d="M4 28 Q12 18 20 28 Q28 38 36 28 Q41 21 46 28" stroke="#7ec8f4" stroke-width="2.5" stroke-linecap="round" fill="none"/>
+        <path d="M4 36 Q12 26 20 36 Q28 46 36 36 Q41 29 46 36" stroke="rgba(255,255,255,0.3)" stroke-width="2" stroke-linecap="round" fill="none"/>
+      </svg>
+    </div>
+
+    <h1 class="i-title">Daily <span>Air Quality</span><br/>Action Agent</h1>
+    <p class="i-tagline">
+      An AI-powered agent that monitors air quality, interprets pollutant data,
+      and delivers personalised health actions and recommendations &mdash; in real time.
+    </p>
+
+    <button class="i-cta" id="launch-btn">
+      <svg width="16" height="16" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+        <path d="M3 8h10M9 4l4 4-4 4" stroke="#fff" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/>
+      </svg>
+      Launch Agent
+    </button>
+
+    <div class="i-stats">
+      <div class="i-stat"><div class="i-stat-n">6</div><div class="i-stat-l">Pollutants Tracked</div></div>
+      <div class="i-stat"><div class="i-stat-n">24/7</div><div class="i-stat-l">Real-time Monitoring</div></div>
+      <div class="i-stat"><div class="i-stat-n">AI</div><div class="i-stat-l">Health Guidance</div></div>
+      <div class="i-stat"><div class="i-stat-n">IBM</div><div class="i-stat-l">watsonx Powered</div></div>
+    </div>
+  </section>
+
+  <!-- Feature cards -->
+  <div class="i-features">
+    <div class="i-feat">
+      <div class="i-feat-icon">
+        <svg width="20" height="20" viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+          <circle cx="10" cy="10" r="7" stroke="#7ec8f4" stroke-width="1.8"/>
+          <path d="M10 6v4l3 2" stroke="#7ec8f4" stroke-width="1.6" stroke-linecap="round"/>
+        </svg>
+      </div>
+      <h3>Real-time AQI Monitoring</h3>
+      <p>Instantly query current Air Quality Index readings for any location, updated continuously from live sensor networks.</p>
+    </div>
+    <div class="i-feat">
+      <div class="i-feat-icon">
+        <svg width="20" height="20" viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+          <path d="M4 14 Q7 8 10 10 Q13 12 16 6" stroke="#7ec8f4" stroke-width="1.8" stroke-linecap="round" fill="none"/>
+          <circle cx="10" cy="10" r="2" fill="#7ec8f4"/>
+        </svg>
+      </div>
+      <h3>Pollutant Breakdown</h3>
+      <p>Deep-dive into PM2.5, PM10, O&#8323;, NO&#8322;, CO, and SO&#8322; with clear context on safe thresholds.</p>
+    </div>
+    <div class="i-feat">
+      <div class="i-feat-icon">
+        <svg width="20" height="20" viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+          <path d="M10 3C6 3 3 6 3 10s3 7 7 7 7-3 7-7-3-7-7-7z" stroke="#7ec8f4" stroke-width="1.8"/>
+          <path d="M7 10l2 2 4-4" stroke="#7ec8f4" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/>
+        </svg>
+      </div>
+      <h3>Health Action Plans</h3>
+      <p>Tailored recommendations for children, elderly, and those with asthma or cardiovascular conditions.</p>
+    </div>
+    <div class="i-feat">
+      <div class="i-feat-icon">
+        <svg width="20" height="20" viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+          <path d="M3 16L7 10l3 3 3-5 4 8" stroke="#7ec8f4" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/>
+        </svg>
+      </div>
+      <h3>Air Quality Forecasts</h3>
+      <p>Plan ahead with multi-day AQI forecasts to schedule outdoor activities on the safest days.</p>
+    </div>
+    <div class="i-feat">
+      <div class="i-feat-icon">
+        <svg width="20" height="20" viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+          <rect x="3" y="5" width="14" height="10" rx="2" stroke="#7ec8f4" stroke-width="1.8"/>
+          <path d="M7 9h6M7 12h4" stroke="#7ec8f4" stroke-width="1.5" stroke-linecap="round"/>
+        </svg>
+      </div>
+      <h3>Indoor Air Quality Tips</h3>
+      <p>Actionable advice on ventilation, air purifiers, and household habits to protect your indoor air.</p>
+    </div>
+    <div class="i-feat">
+      <div class="i-feat-icon">
+        <svg width="20" height="20" viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+          <circle cx="10" cy="10" r="7" stroke="#7ec8f4" stroke-width="1.8"/>
+          <path d="M8 8s.5-1.5 2-1.5 2 1 2 2c0 1.5-2 2-2 3.5" stroke="#7ec8f4" stroke-width="1.5" stroke-linecap="round"/>
+          <circle cx="10" cy="14.5" r=".8" fill="#7ec8f4"/>
+        </svg>
+      </div>
+      <h3>Natural Language Q&amp;A</h3>
+      <p>Ask anything in plain English. IBM watsonx understands context and responds with precise, actionable answers.</p>
+    </div>
+  </div>
+
+  <!-- AQI Scale -->
+  <div class="i-aqi-section">
+    <div class="i-section-title">AQI Scale Reference</div>
+    <div class="i-aqi-row">
+      <div class="i-band bg-good"><div class="i-band-r">0&ndash;50</div><div class="i-band-l">Good</div></div>
+      <div class="i-band bg-moderate"><div class="i-band-r">51&ndash;100</div><div class="i-band-l">Moderate</div></div>
+      <div class="i-band bg-sensitive"><div class="i-band-r">101&ndash;150</div><div class="i-band-l">Sensitive</div></div>
+      <div class="i-band bg-unhealthy"><div class="i-band-r">151&ndash;200</div><div class="i-band-l">Unhealthy</div></div>
+      <div class="i-band bg-very"><div class="i-band-r">201&ndash;300</div><div class="i-band-l">Very Unhealthy</div></div>
+      <div class="i-band bg-hazardous"><div class="i-band-r">301+</div><div class="i-band-l">Hazardous</div></div>
+    </div>
+  </div>
+
+  <!-- How it works -->
+  <div class="i-how">
+    <div class="i-section-title">How It Works</div>
+    <div class="i-steps">
+      <div class="i-step">
+        <div class="i-step-n">1</div>
+        <h3>Ask a Question</h3>
+        <p>Type any air quality question in natural language &mdash; location, pollutant, activity, or health concern.</p>
+      </div>
+      <div class="i-step">
+        <div class="i-step-n">2</div>
+        <h3>Agent Processes</h3>
+        <p>IBM watsonx analyses your query, pulls live AQI data, and applies health guidelines.</p>
+      </div>
+      <div class="i-step">
+        <div class="i-step-n">3</div>
+        <h3>Get Actions</h3>
+        <p>Receive a clear, personalised response with specific actions, precautions, or forecasts.</p>
+      </div>
+      <div class="i-step">
+        <div class="i-step-n">4</div>
+        <h3>Stay Informed</h3>
+        <p>Continue the conversation to explore deeper insights, compare cities, or plan your week safely.</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- Intro footer -->
+  <div class="i-footer">
+    <span>&copy; 2025 Daily Air Quality Action Agent</span>
+    <div class="i-powered">Powered by <strong>IBM watsonx Orchestrate</strong></div>
+    <span>Made with IBM Bob</span>
+  </div>
+
+</div><!-- /intro-page -->
+
+
+<!-- ══════════════════════════════════════════
+     APP PAGE
+══════════════════════════════════════════ -->
+<div id="app-page">
+
+  <header class="app-header">
+    <svg class="app-header-icon" viewBox="0 0 40 40" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+      <circle cx="20" cy="20" r="20" fill="#2c5f8a"/>
+      <path d="M8 20 Q14 13 20 20 Q26 27 32 20" stroke="#7ec8f4" stroke-width="2.2" stroke-linecap="round" fill="none"/>
+      <path d="M8 25 Q14 18 20 25 Q26 32 32 25" stroke="#ffffff" stroke-width="1.6" stroke-linecap="round" fill="none" opacity="0.6"/>
+      <circle cx="20" cy="14" r="3.5" fill="#f5a623"/>
+      <path d="M20 10 L21 7 M20 10 L17.5 7.5 M20 10 L22.5 7.5" stroke="#f5a623" stroke-width="1.2" stroke-linecap="round"/>
+    </svg>
+    <div class="app-header-text">
+      <h1>Daily Air Quality Action Agent</h1>
+      <p>Powered by IBM watsonx Orchestrate &mdash; Real-time AQI insights &amp; recommendations</p>
+    </div>
+    <div class="app-header-right">
+      <div class="live-badge"><div class="live-dot"></div> Live</div>
+      <button class="back-btn" id="back-btn">&#8592; Back</button>
+    </div>
+  </header>
+
+  <div class="aqi-strip">
+    <span class="strip-lbl">AQI Scale:</span>
+    <div class="lchip lchip-good">0&ndash;50 Good</div>
+    <div class="lchip lchip-moderate">51&ndash;100 Moderate</div>
+    <div class="lchip lchip-sensitive">101&ndash;150 Sensitive</div>
+    <div class="lchip lchip-unhealthy">151&ndash;200 Unhealthy</div>
+    <div class="lchip lchip-very">201&ndash;300 Very Unhealthy</div>
+    <div class="lchip lchip-hazardous">301+ Hazardous</div>
+  </div>
+
+  <div class="app-body">
+
+    <aside class="sidebar">
+      <div>
+        <div class="sb-ttl">Key Pollutants</div>
+        <div class="p-grid">
+          <div class="p-card"><div class="pl">PM2.5</div><div class="pv">&mdash;</div><div class="pu">&micro;g/m&sup3;</div></div>
+          <div class="p-card"><div class="pl">PM10</div><div class="pv">&mdash;</div><div class="pu">&micro;g/m&sup3;</div></div>
+          <div class="p-card"><div class="pl">O&#8323;</div><div class="pv">&mdash;</div><div class="pu">ppb</div></div>
+          <div class="p-card"><div class="pl">NO&#8322;</div><div class="pv">&mdash;</div><div class="pu">ppb</div></div>
+          <div class="p-card"><div class="pl">CO</div><div class="pv">&mdash;</div><div class="pu">ppm</div></div>
+          <div class="p-card"><div class="pl">SO&#8322;</div><div class="pv">&mdash;</div><div class="pu">ppb</div></div>
+        </div>
+      </div>
+
+      <div>
+        <div class="sb-ttl">Recommendations</div>
+        <ul class="rec-ul">
+          <li>Ask the agent for your city&rsquo;s current AQI reading.</li>
+          <li>Request personalised health actions for your profile.</li>
+          <li>Get indoor air quality tips for high-pollution days.</li>
+          <li>Get forecasts to plan outdoor activities safely.</li>
+        </ul>
+      </div>
+
+      <div>
+        <div class="sb-ttl">Quick Prompts</div>
+        <div class="qp-list">
+          <button class="qp-btn">What is the AQI in Sydney today?</button>
+          <button class="qp-btn">Is it safe to exercise outdoors right now?</button>
+          <button class="qp-btn">What are the main pollutants affecting air quality?</button>
+          <button class="qp-btn">Give me tips to reduce indoor air pollution.</button>
+          <button class="qp-btn">What actions should I take on a Hazardous AQI day?</button>
+        </div>
+      </div>
+    </aside>
+
+    <section class="chat-panel">
+      <div class="chat-topbar">
+        <div class="online-dot"></div>
+        <h2>AQI Action Agent</h2>
+        <p>Ask anything about air quality, health risks, or recommended actions</p>
+      </div>
+      <!-- IBM watsonx Orchestrate renders the chat widget here -->
+      <div id="root"></div>
+    </section>
+
+  </div>
+
+  <footer class="app-footer">
+    Made with IBM Bob &nbsp;|&nbsp; Daily Air Quality Action Agent &nbsp;|&nbsp; IBM watsonx Orchestrate
+  </footer>
+
+</div><!-- /app-page -->
+
+
+<!-- Page switch -->
+<script>
+  document.getElementById('launch-btn').addEventListener('click', function () {
+    document.getElementById('intro-page').style.display = 'none';
+    document.getElementById('app-page').classList.add('visible');
+  });
+  document.getElementById('back-btn').addEventListener('click', function () {
+    document.getElementById('app-page').classList.remove('visible');
+    var ip = document.getElementById('intro-page');
+    ip.style.display = 'flex';
+    ip.style.backgroundColor = '#0f2d4a';
+    ip.style.color = '#ffffff';
+  });
+</script>
+
+<!-- IBM watsonx Orchestrate Embedded Chat -->
+<script>
+  window.wxOConfiguration = {
+    orchestrationID: "83a5874a3aa547b8b93c8c6fc9ccc878_50d8dded-1b5a-4969-b3a1-6f0068dfad60",
+    hostURL: "https://au-syd.watson-orchestrate.cloud.ibm.com",
+    rootElementID: "root",
+    deploymentPlatform: "ibmcloud",
+    crn: "crn:v1:bluemix:public:watsonx-orchestrate:au-syd:a/83a5874a3aa547b8b93c8c6fc9ccc878:50d8dded-1b5a-4969-b3a1-6f0068dfad60::",
+    chatOptions: {
+      agentId: "184bb70b-e39b-4174-ac46-c54b79877120"
+    }
+  };
+  setTimeout(function () {
+    var s = document.createElement('script');
+    s.src = window.wxOConfiguration.hostURL + '/wxochat/wxoLoader.js?embed=true';
+    s.addEventListener('load', function () { wxoLoader.init(); });
+    document.head.appendChild(s);
+  }, 0);
+</script>
+
+</body>
+</html>
